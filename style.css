@@ -1,0 +1,167 @@
+
+/* Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap');
+
+/* Custom Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+.dark ::-webkit-scrollbar-thumb { background: #475569; }
+
+/* Base Styles & Mobile Pull-to-Refresh Fix */
+html, body { 
+    -webkit-tap-highlight-color: transparent; 
+    overscroll-behavior: none !important; 
+    overscroll-behavior-y: none !important;
+}
+
+/* 🚀 Traps all scrolling strictly inside the app view so it never triggers a browser reload */
+#main-scroll-area {
+    overscroll-behavior: contain !important; 
+    -webkit-overflow-scrolling: touch; /* Ensures smooth scrolling on iPhones */
+}
+
+/* Premium UI Base Classes */
+.premium-input {
+    width: 100%;
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+    color: #1e293b;
+    outline: none;
+    transition: all 0.2s ease-in-out;
+}
+.dark .premium-input {
+    background-color: #0f172a;
+    border-color: #334155;
+    color: #f1f5f9;
+}
+.premium-input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.3);
+}
+
+.premium-label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #475569;
+    margin-bottom: 0.25rem;
+}
+.dark .premium-label { color: #94a3b8; }
+
+.premium-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+}
+.premium-btn:active { transform: scale(0.95); }
+
+.premium-card {
+    background-color: #ffffff;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.04);
+    border: 1px solid #f1f5f9;
+    transition: all 0.3s ease-in-out;
+}
+.dark .premium-card {
+    background-color: #1e293b;
+    border-color: rgba(51, 65, 85, 0.5);
+}
+
+/* Table Styles */
+.table-container {
+    overflow-x: auto;
+    border-radius: 0.75rem;
+    border: 1px solid #e2e8f0;
+}
+.dark .table-container { border-color: #334155; }
+
+.premium-table {
+    width: 100%;
+    text-align: left;
+    white-space: nowrap;
+    border-collapse: collapse;
+}
+.premium-table th {
+    background-color: #f8fafc;
+    padding: 0.75rem 1rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+.dark .premium-table th { background-color: #0f172a; color: #94a3b8; }
+
+.premium-table td {
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    border-top: 1px solid #e2e8f0;
+    color: #334155;
+}
+.dark .premium-table td { border-top-color: #334155; color: #cbd5e1; }
+
+.premium-table tr:hover td { background-color: rgba(248, 250, 252, 0.5); }
+.dark .premium-table tr:hover td { background-color: rgba(51, 65, 85, 0.3); }
+
+/* Toast Notifications */
+#toast-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.toast {
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 14px 40px rgba(37, 99, 235, 0.15);
+    background-color: #1e293b;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transform: translateY(2.5rem);
+    opacity: 0;
+    transition: all 0.3s;
+}
+.dark .toast { background-color: #ffffff; color: #1e293b; }
+.toast.show { transform: translateY(0); opacity: 1; }
+
+/* Responsive Header Ad Container (Absolute Centering & Layout Fix) */
+.ad-wrapper {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none; /* Prevents invisible parts from blocking clicks */
+}
+
+.ad-scaler {
+    width: 728px;
+    height: 90px;
+    transform-origin: center;
+    pointer-events: auto; /* Allows the actual ad to be clicked */
+}
+
+/* Dynamically scale the ad to fit perfectly between the buttons on smaller screens */
+@media (max-width: 1024px) { .ad-scaler { transform: scale(0.8); } }
+@media (max-width: 768px) { .ad-scaler { transform: scale(0.6); } }
+@media (max-width: 480px) { .ad-scaler { transform: scale(0.35); } }
+@media (max-width: 380px) { .ad-scaler { transform: scale(0.3); } }

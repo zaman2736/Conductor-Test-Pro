@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2563eb">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=0.8, user-scalable=no">
+    <title>Conductor Laboratory Test</title>
+    
+    <!-- External CSS -->
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Phosphor Icons for premium SaaS look -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: { primary: '#2563eb' },
+                    boxShadow: {
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                        'card': '0 8px 30px rgba(0,0,0,0.04)',
+                        'floating': '0 14px 40px rgba(37, 99, 235, 0.15)'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 h-screen overflow-hidden flex transition-colors duration-300">
+
+    <!-- Mobile Sidebar Backdrop -->
+    <div id="sidebar-backdrop" class="fixed inset-0 bg-slate-900/50 z-40 hidden lg:hidden backdrop-blur-sm transition-opacity opacity-0" onclick="toggleSidebar()"></div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-72 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 flex flex-col shadow-2xl lg:shadow-none lg:static">
+        <div class="h-20 flex items-center px-6 border-b border-slate-100 dark:border-slate-700/50">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-blue-400 flex items-center justify-center text-white shadow-lg shadow-blue-500/30 mr-3">
+                <i class="ph ph-hexagon text-2xl"></i>
+            </div>
+            <h1 class="text-xl font-bold tracking-tight">Conductor Test <span class="text-primary">Pro</span></h1>
+        </div>
+
+        <nav class="flex-1 overflow-y-auto py-6 px-4 space-y-1">
+            <button onclick="navigate('dashboard')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 bg-blue-50 dark:bg-blue-900/20 text-primary" data-target="dashboard">
+                <i class="ph ph-squares-four text-xl"></i> Dashboard
+            </button>
+            <button onclick="navigate('single-wire')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-all duration-200" data-target="single-wire">
+                <i class="ph ph-flask text-xl"></i> Single Wire Test
+            </button>
+            <button onclick="navigate('zinc-coating')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-all duration-200" data-target="zinc-coating">
+                <i class="ph ph-target text-xl"></i> Zinc Coating Test
+            </button>
+            <button onclick="navigate('carbon-black')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-all duration-200" data-target="carbon-black">
+                <i class="ph ph-fire text-xl"></i> Carbon Black Test
+            </button>
+            <button onclick="navigate('die-reduction')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-all duration-200" data-target="die-reduction">
+                <i class="ph ph-arrow-line-down text-xl"></i> Die Reduction
+            </button>
+            <button onclick="navigate('conductor-data')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-all duration-200" data-target="conductor-data">
+                <i class="ph ph-database text-xl"></i> Cable Data Finder
+            </button>
+            <button onclick="navigate('developer')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-all duration-200" data-target="developer">
+                <i class="ph ph-code text-xl"></i> Developer Info
+            </button>
+        </nav>
+
+        <!-- APP USER PROFILE (Dynamic) -->
+        <div class="p-4 border-t border-slate-100 dark:border-slate-700/50 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors" onclick="navigate('profile')">
+            <div class="flex items-center gap-3">
+                <img id="sidebar-avatar" src="" alt="Profile" class="w-10 h-10 rounded-full object-cover border border-slate-200 dark:border-slate-600">
+                <div class="flex-1 min-w-0">
+                    <p id="sidebar-name" class="text-sm font-semibold truncate">User Name</p>
+                    <p id="sidebar-address" class="text-xs text-slate-500 dark:text-slate-400 truncate">Address</p>
+                </div>
+                <i class="ph ph-gear text-slate-400"></i>
+            </div>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col h-full overflow-hidden relative">
+        <header class="relative h-[70px] md:h-[90px] w-full flex items-center justify-between px-4 sm:px-6 bg-white/90 dark:bg-slate-800/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-700/50 z-30 overflow-hidden">
+            <div class="flex items-center gap-4 z-10">
+                <button onclick="toggleSidebar()" class="lg:hidden p-2 rounded-xl text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors bg-white/50 dark:bg-slate-800/50 backdrop-blur-md">
+                    <i class="ph ph-list text-2xl"></i>
+                </button>
+                <h2 id="page-title" class="text-xl font-semibold hidden lg:block whitespace-nowrap">Dashboard</h2>
+            </div>
+            
+            <div class="ad-wrapper">
+                <div class="ad-scaler">
+                    <iframe 
+                        sandbox="allow-scripts allow-same-origin" 
+                        scrolling="no" 
+                        frameborder="0" 
+                        style="width: 728px; height: 90px; border: none; overflow: hidden; background: transparent;"
+                        srcdoc="<!DOCTYPE html><html><head><style>body{margin:0;padding:0;display:flex;justify-content:center;align-items:center;overflow:hidden;}</style></head><body><script type='text/javascript'>atOptions = {'key' : 'a9da765e199d7d62ab51fd2c4251f1ac', 'format' : 'iframe', 'height' : 90, 'width' : 728, 'params' : {}};</script><script type='text/javascript' src='https://www.highperformanceformat.com/a9da765e199d7d62ab51fd2c4251f1ac/invoke.js'></script></body></html>">
+                    </iframe>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-3 z-10">
+                <button onclick="toggleDarkMode()" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:scale-105 transition-transform backdrop-blur-md">
+                    <i id="theme-icon" class="ph ph-moon text-xl"></i>
+                </button>
+            </div>
+        </header>
+
+        <div class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8 w-full max-w-7xl mx-auto" id="main-scroll-area">
+            
+            <!-- 🏠 DASHBOARD VIEW -->
+            <div id="view-dashboard" class="view-section animate-fade-in">
+                <div class="bg-gradient-to-r from-primary to-red-400 rounded-2xl p-4 text-black shadow-floating mb-6 relative overflow-hidden">
+                    <div class="relative z-10">
+                        <h2 class="text-xl font-bold mb-2">Fast, Accurate & Reliable Conductor Testing</h2>
+                        <p class="text-blue-100 max-w-xl">Your conductor testing companion in the laboratory. Get fast and accurate testing results, track all conductor data, and monitor quality—anytime, anywhere.</p>
+                    </div>
+                    <i class="ph ph-pulse absolute -bottom-10 -right-10 text-9xl text-white opacity-10 transform -rotate-12"></i>
+                </div>
+
+                <h3 class="text-lg font-semibold mb-4">Quick Overview</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                    <div class="premium-card !p-5">
+                        <p class="text-sm text-slate-500 dark:text-slate-400 mb-1">Today's Tests</p>
+                        <h4 id="stat-today" class="text-2xl font-bold">0</h4>
+                    </div>
+                    <div class="premium-card !p-5">
+                        <p class="text-sm text-slate-500 dark:text-slate-400 mb-1">Total Tests</p>
+                        <h4 id="stat-total" class="text-2xl font-bold">0</h4>
+                    </div>
+                    <div class="premium-card !p-5">
+                        <p class="text-sm text-slate-500 dark:text-slate-400 mb-1">Average Result</p>
+                        <h4 id="stat-avg" class="text-2xl font-bold">0.00</h4>
+                    </div>
+                    <div class="premium-card !p-5">
+                        <p class="text-sm text-slate-500 dark:text-slate-400 mb-1">Last Test Result</p>
+                        <h4 id="stat-last" class="text-2xl font-bold text-primary">N/A</h4>
+                    </div>
+                </div>
+
+                <h3 class="text-lg font-semibold mb-4">Testing Modules</h3>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="premium-card hover:-translate-y-1 hover:shadow-xl group cursor-pointer" onclick="navigate('single-wire')">
+                        <div class="flex items-start gap-4">
+                            <div class="p-3 bg-blue-50 dark:bg-blue-900/30 text-primary rounded-xl group-hover:scale-110 transition-transform"><i class="ph ph-flask text-2xl"></i></div>
+                            <div>
+                                <h4 class="text-lg font-bold mb-1">Single Wire Test</h4>
+                                <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">Calculate Average Dia, Resistance, Resistivity, TS, and Conductivity.</p>
+                                <span class="text-sm font-semibold text-primary flex items-center gap-1 group-hover:gap-2 transition-all">Open Module <i class="ph ph-arrow-right"></i></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="premium-card hover:-translate-y-1 hover:shadow-xl group cursor-pointer" onclick="navigate('zinc-coating')">
+                        <div class="flex items-start gap-4">
+                            <div class="p-3 bg-teal-50 dark:bg-teal-900/30 text-teal-600 rounded-xl group-hover:scale-110 transition-transform"><i class="ph ph-target text-2xl"></i></div>
+                            <div>
+                                <h4 class="text-lg font-bold mb-1">Zinc Coating Test</h4>
+                                <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">Determine the weight of zinc coating on steel wire through chemical reactions and calculations..</p>
+                                <span class="text-sm font-semibold text-teal-600 flex items-center gap-1 group-hover:gap-2 transition-all">Open Module <i class="ph ph-arrow-right"></i></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="premium-card hover:-translate-y-1 hover:shadow-xl group cursor-pointer" onclick="navigate('carbon-black')">
+                        <div class="flex items-start gap-4">
+                            <div class="p-3 bg-orange-50 dark:bg-orange-900/30 text-orange-600 rounded-xl group-hover:scale-110 transition-transform"><i class="ph ph-fire text-2xl"></i></div>
+                            <div>
+                                <h4 class="text-lg font-bold mb-1">Carbon Black Test</h4>
+                                <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">Calculate the percentage of carbon black content via combustion testing.</p>
+                                <span class="text-sm font-semibold text-orange-600 flex items-center gap-1 group-hover:gap-2 transition-all">Open Module <i class="ph ph-arrow-right"></i></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="premium-card hover:-translate-y-1 hover:shadow-xl group cursor-pointer" onclick="navigate('die-reduction')">
+                        <div class="flex items-start gap-4">
+                            <div class="p-3 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 rounded-xl group-hover:scale-110 transition-transform"><i class="ph ph-arrow-line-down text-2xl"></i></div>
+                            <div>
+                                <h4 class="text-lg font-bold mb-1">Die Reduction</h4>
+                                <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">Calculate multi-stage die area reduction sequences dynamically.</p>
+                                <span class="text-sm font-semibold text-indigo-600 flex items-center gap-1 group-hover:gap-2 transition-all">Open Module <i class="ph ph-arrow-right"></i></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="premium-card hover:-translate-y-1 hover:shadow-xl group cursor-pointer" onclick="navigate('conductor-data')">
+                        <div class="flex items-start gap-4">
+                            <div class="p-3 bg-purple-50 dark:bg-purple-900/30 text-purple-600 rounded-xl group-hover:scale-110 transition-transform"><i class="ph ph-database text-2xl"></i></div>
+                            <div>
+                                <h4 class="text-lg font-bold mb-1">Conductor Specifications Finder</h4>
+                                <p class="text-sm text-slate-500 dark:text-slate-400 mb-4">Search all conductors specifications with one click.</p>
+                                <span class="text-sm font-semibold text-purple-600 flex items-center gap-1 group-hover:gap-2 transition-all">Open Database <i class="ph ph-arrow-right"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 🧪 SINGLE WIRE TEST VIEW -->
+            <div id="view-single-wire" class="view-section hidden animate-fade-in">
+                <div class="flex flex-col gap-6 max-w-5xl mx-auto">
+                    <div class="flex items-center">
+                        <button onclick="navigate('dashboard')" class="flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-primary to-blue-400 text-white rounded-xl shadow-md hover:-translate-y-0.5 transition-all text-sm font-semibold border border-blue-400/50">
+                            <i class="ph ph-house text-lg"></i> Back to Home
+                        </button>
+                    </div>
+
+                    <div class="premium-card">
+                        <h3 class="text-lg font-bold mb-4 flex items-center gap-2"><i class="ph ph-calculator text-primary"></i> Data Entry (8 Parameters)</h3>
+                        <form id="form-sw" onsubmit="calculateSingleWire(event)" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+                            <div><label class="premium-label">Diameter 1 (mm)</label><input type="number" step="any" id="sw-d1" class="premium-input" required placeholder="0.00"></div>
+                            <div><label class="premium-label">Diameter 2 (mm)</label><input type="number" step="any" id="sw-d2" class="premium-input" required placeholder="0.00"></div>
+                            <div><label class="premium-label">Diameter 3 (mm)</label><input type="number" step="any" id="sw-d3" class="premium-input" required placeholder="0.00"></div>
+                            <div><label class="premium-label">Diameter 4 (mm)</label><input type="number" step="any" id="sw-d4" class="premium-input" required placeholder="0.00"></div>
+                            <div><label class="premium-label">Tensile Str. (KN)</label><input type="number" step="any" id="sw-ts" class="premium-input" required placeholder="0.00"></div>
+                            <div><label class="premium-label">Resistance (Ω)</label><input type="number" step="any" id="sw-res" class="premium-input" required placeholder="0.00"></div>
+                            <div><label class="premium-label">Temperature (°C)</label><input type="number" step="any" id="sw-temp" class="premium-input" required placeholder="20"></div>
+                            <div><label class="premium-label">Elongation (mm)</label><input type="number" step="any" id="sw-el" class="premium-input" required placeholder="0.00"></div>
+                            
+                            <div class="flex gap-2 lg:col-span-4 mt-2">
+                                <button type="submit" class="premium-btn bg-primary text-white hover:bg-blue-700 flex-1 shadow-lg shadow-blue-500/30">Calculate </button>
+                                <button type="button" onclick="resetForm('form-sw', 'result-card-sw')" class="premium-btn bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200">Reset</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div id="result-card-sw" class="premium-card !p-0 overflow-hidden hidden transform transition-transform duration-300">
+                        <div class="p-4 bg-slate-50 dark:bg-slate-800/80 border-b border-slate-100 dark:border-slate-700">
+                            <h4 class="text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-2"><i class="ph ph-chart-line-up text-primary"></i> Computation Results</h4>
+                        </div>
+                        <div id="sw-results-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 md:p-6 bg-white dark:bg-slate-800"></div>
+                    </div>
+
+                    <div class="premium-card">
+                        <h3 class="text-lg font-bold mb-4 flex items-center gap-2"><i class="ph ph-list-dashes text-primary"></i> Test History</h3>
+                        <div class="table-container">
+                            <table class="premium-table text-xs">
+                                <thead>
+                                    <tr>
+                                        <th class="w-10">#</th>
+                                        <th>Date & Time</th>
+                                        <th>Avg Dia (mm)</th>
+                                        <th>Area (mm²)</th>
+                                        <th>T.S (Mpa)</th>
+                                        <th>Elong (%)</th>
+                                        <th>Res @20°C</th>
+                                        <th>Conductivity</th>
+                                        <th>1m Wt (gm)</th>
+                                        <th class="text-right">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-sw"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ⚙ ZINC COATING TEST VIEW -->
+            <div id="view-zinc-coating" class="view-section hidden animate-fade-in">
+                <div class="flex flex-col gap-6 max-w-4xl mx-auto">
+                    <div class="flex items-center">
+                        <button onclick="navigate('dashboard')" class="flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-teal-500 to-teal-400 text-white rounded-xl shadow-md hover:-translate-y-0.5 transition-all text-sm font-semibold border border-teal-400/50">
+                            <i class="ph ph-house text-lg"></i> Back to Home
+                        </button>
+                    </div>
+
+                    <div class="premium-card">
+                        <h3 class="text-lg font-bold mb-4 flex items-center gap-2"><i class="ph ph-calculator text-teal-500"></i> Data Entry</h3>
+                        <form id="form-zc" onsubmit="calculateZincCoating(event)" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
+                            <div><label class="premium-label">Weight 1 (gm)</label><input type="number" step="any" id="zc-w1" class="premium-input" required placeholder="0.00"></div>
+                            <div><label class="premium-label">Weight 2 (gm)</label><input type="number" step="any" id="zc-w2" class="premium-input" required placeholder="0.00"></div>
+                            <div><label class="premium-label">Diameter (mm)</label><input type="number" step="any" id="zc-dia" class="premium-input" required placeholder="0.00"></div>
+                            <div><label class="premium-label">M (Constant)</label><input type="number" step="any" id="zc-m" class="premium-input !bg-slate-100 dark:!bg-slate-800/50 cursor-not-allowed" readonly value="1960"></div>
+                            <div class="flex gap-2">
+                                <button type="submit" class="premium-btn bg-teal-600 text-white hover:bg-teal-700 flex-1 px-0 shadow-lg shadow-teal-500/30">Calculate</button>
+                                <button type="button" onclick="resetForm('form-zc', 'result-card-zc')" class="premium-btn bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 flex-1 px-0">Reset</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div id="result-card-zc" class="premium-card !p-0 overflow-hidden hidden transform transition-transform duration-300"></div>
+
+                    <div class="premium-card">
+                        <h3 class="text-lg font-bold mb-4 flex items-center gap-2"><i class="ph ph-list-dashes text-teal-500"></i> Test History</h3>
+                        <div class="table-container">
+                            <table class="premium-table">
+                                <thead>
+                                    <tr>
+                                        <th class="w-10">#</th>
+                                        <th>Date & Time</th>
+                                        <th>W1 (gm)</th>
+                                        <th>W2 (gm)</th>
+                                        <th>Dia (mm)</th>
+                                        <th>Zinc Coating (%)</th>
+                                        <th class="text-right">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-zc"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 🧫 CARBON BLACK TEST VIEW -->
+            <div id="view-carbon-black" class="view-section hidden animate-fade-in">
+                <div class="flex flex-col gap-6 max-w-4xl mx-auto">
+                    <div class="flex items-center">
+                        <button onclick="navigate('dashboard')" class="flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-orange-500 to-orange-400 text-white rounded-xl shadow-md hover:-translate-y-0.5 transition-all text-sm font-semibold border border-orange-400/50">
+                            <i class="ph ph-house text-lg"></i> Back to Home
+                        </button>
+                    </div>
+
+                    <div class="premium-card">
+                        <h3 class="text-lg font-bold mb-4 flex items-center gap-2"><i class="ph ph-calculator text-orange-500"></i> Data Entry</h3>
+                        <form id="form-cb" onsubmit="calculateCarbonBlack(event)" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+                            <div><label class="premium-label">W1 - Boat After Cool (gm)</label><input type="number" step="any" id="cb-w1" class="premium-input" required placeholder="0.00"></div>
+                            <div><label class="premium-label">W2 - Sample (gm)</label><input type="number" step="any" id="cb-w2" class="premium-input" required placeholder="0.00"></div>
+                            <div><label class="premium-label">W3 - Boat + Residue (gm)</label><input type="number" step="any" id="cb-w3" class="premium-input" required placeholder="0.00"></div>
+                            <div class="flex gap-2">
+                                <button type="submit" class="premium-btn bg-orange-500 text-white hover:bg-orange-600 flex-1 px-0 shadow-lg shadow-orange-500/30">Calculate</button>
+                                <button type="button" onclick="resetForm('form-cb', 'result-card-cb')" class="premium-btn bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 flex-1 px-0">Reset</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div id="result-card-cb" class="premium-card !p-0 overflow-hidden hidden transform transition-transform duration-300"></div>
+
+                    <div class="premium-card">
+                        <h3 class="text-lg font-bold mb-4 flex items-center gap-2"><i class="ph ph-list-dashes text-orange-500"></i> Test History</h3>
+                        <div class="table-container">
+                            <table class="premium-table">
+                                <thead>
+                                    <tr>
+                                        <th class="w-10">#</th>
+                                        <th>Date & Time</th>
+                                        <th>Boat (W1)</th>
+                                        <th>Sample (W2)</th>
+                                        <th>Residue (W4)</th>
+                                        <th>CB (%)</th>
+                                        <th class="text-right">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-cb"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 📉 DIE REDUCTION VIEW -->
+            <div id="view-die-reduction" class="view-section hidden animate-fade-in">
+                <div class="flex flex-col gap-6 max-w-4xl mx-auto">
+                    <div class="flex items-center">
+                        <button onclick="navigate('dashboard')" class="flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-indigo-500 to-indigo-400 text-white rounded-xl shadow-md hover:-translate-y-0.5 transition-all text-sm font-semibold border border-indigo-400/50">
+                            <i class="ph ph-house text-lg"></i> Back to Home
+                        </button>
+                    </div>
+                    
+                    <div class="premium-card">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                            <div>
+                                <h3 class="text-lg font-bold flex items-center gap-2"><i class="ph ph-arrow-line-down text-indigo-500"></i> Die Sequence Calculator</h3>
+                                <p class="text-sm text-slate-500 mt-1">Enter output diameter to auto-generate the next die.</p>
+                            </div>
+                            <div class="flex gap-2 w-full sm:w-auto">
+                                <button onclick="saveDieReduction()" class="premium-btn bg-indigo-600 text-white hover:bg-indigo-700 flex-1 sm:flex-none shadow-lg shadow-indigo-500/30">Save Test</button>
+                                <button onclick="initDieReduction()" class="premium-btn bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200 flex-1 sm:flex-none">Reset</button>
+                            </div>
+                        </div>
+
+                        <div class="table-container mb-6">
+                            <table class="premium-table">
+                                <thead>
+                                    <tr>
+                                        <th class="w-16 text-center">Die #</th>
+                                        <th>Input Dia (mm)</th>
+                                        <th>Output Dia (mm)</th>
+                                        <th>Reduction (%)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="die-calc-tbody"></tbody>
+                            </table>
+                        </div>
+
+                        <div id="result-card-dr" class="premium-card !p-0 overflow-hidden hidden transform transition-transform duration-300 border border-indigo-100 dark:border-indigo-900/50"></div>
+                    </div>
+
+                    <div class="premium-card">
+                        <h3 class="text-lg font-bold mb-4 flex items-center gap-2"><i class="ph ph-list-dashes text-indigo-500"></i> Saved Sequences</h3>
+                        <div class="table-container">
+                            <table class="premium-table">
+                                <thead>
+                                    <tr>
+                                        <th class="w-10">#</th>
+                                        <th>Date & Time</th>
+                                        <th>Starting Dia</th>
+                                        <th>Final Dia</th>
+                                        <th>Total Dies</th>
+                                        <th>Total Red. (%)</th>
+                                        <th class="text-right">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-dr"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 📊 CONDUCTOR DATA REQUIREMENT VIEW -->
+            <div id="view-conductor-data" class="view-section hidden animate-fade-in">
+                <div class="flex flex-col gap-6 max-w-2xl mx-auto">
+                    <div class="flex items-center">
+                        <button onclick="navigate('dashboard')" class="flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-purple-500 to-purple-400 text-white rounded-xl shadow-md hover:-translate-y-0.5 transition-all text-sm font-semibold border border-purple-400/50">
+                            <i class="ph ph-house text-lg"></i> Back to Home
+                        </button>
+                    </div>
+
+                    <div class="premium-card">
+                        <h3 class="text-sm font-bold text-slate-700 dark:text-slate-300 mb-4">Select Cable & Data</h3>
+                        <div class="space-y-4">
+                            <select id="conductor-select" class="premium-input cursor-pointer" onchange="renderConductorData()">
+                                <option value="" disabled selected>Select Cable Type...</option>
+                                <option value="D-1">D-1(SWALLOW)</option>
+                                <option value="D-2">D-2(RAVEN)</option>
+                                <option value="D-3">D-3(PENGUIN)</option>
+                                <option value="D-4">D-4(Grounding wire)</option>
+                                <option value="D-5">D-5(Tie wire)</option>
+                                <option value="D-6">D-6(Annealed copper wire)</option>
+                                <option value="D-7">D-7(MHD stranded copper conductor)</option>
+                                <option value="D-8">D-8(MHD stranded copper conductor)</option>
+                                <option value="D-9">D-9(MHD stranded copper conductor)</option>
+                                <option value="D-10">D-10(MHD stranded copper conductor)</option>
+                                <option value="D-11">D-11(Duplex)</option>
+                                <option value="D-12">D-12(Duplex)</option>
+                                <option value="D-14">D-14(Quaduplex)</option>
+                                <option value="D-15">D-15(Quaduplex)</option>
+                                <option value="D-24">D-24(Quaduplex)</option>
+                                <option value="D-25">D-25(Quaduplex)</option>
+                                <option value="D-27">D-27(GROSBEAK)</option> 
+                                <option value="D-28">D-28(HAWK)</option> 
+                               <option value="D-59">D-59(HDPE Insulated)</option>
+                                <option value="D-61">D-61(HDPE Insulated)</option>
+                                <option value="D-62">D-62(HDPE Insulated)</option>
+                                <option value="dog">ACSR DOG</option>
+                                <option value="ant">AAC ANT</option>
+                                <option value="wasp">AAC WASP</option>
+                                <option value="merlin">ACSR MERLIN</option>
+                                <option value="guy">Guy Wire</option>
+                                <option value=" "></option>
+                            </select>
+
+                            <select id="parameter-select" class="premium-input cursor-pointer" onchange="renderConductorData()">
+                                <option value="all" selected>Show All Data Columns</option>
+                                <option value="awg">SIZE</option>
+                                <option value="single">No & Dimension of Aluminum wire</option>
+                                <option value="steel">No & Dimension of Steel wire</option>
+                                <option value="copper">No & Dimension of Copper wire</option>
+                                <option value="conductor">Conductor Diameter</option>
+                                <option value="insulation">Insulation Thikness</option>
+                                <option value="overall">Overall Diameter</option>
+                                <option value="lay">Direction of Lay</option>
+                                <option value="ratio">Lay Ratio</option>
+                                <option value="res">D.C Resistance of Conductor at 20°C(max.)</option>
+                                <option value="con">Conductivity at 20°C(min.)</option>
+                                <option value="unaget">Unaged T.S(min.)</option>
+                                <option value="unageelon">Unaged Elongation(min.)</option>
+                                <option value="agets">Aged T.S(min.)</option>
+                                <option value="ageelon">Aged Elongation(min.)</option>
+                                <option value="tsvalue">Aged t.s  (of unaged value) min</option>
+                                <option value="elonvalue">Ageed elongation(of unaged value) min</option>
+                                <option value="distro">Heat Distortion (Max.) (121°C±1)</option>
+                                <option value="pitch">Pitch Assembly</option>
+                                <option value="carbon">Carbon black content test</option>
+                                <option value="degree">Degree of Cross Linking</option>
+                                <option value="insreg">Insulation Resistance at 15.6°C (min.)</option>
+                                <option value="hot">Hot Creep Test i)under specified required load.ii)Permanent elongation without load(max.)</option>
+                                <option value="load">Braking Load (approx) with steel</option>
+                                <option value="weight">Approx Weight</option>
+                                <option value="zinc">Weight of Zinc Coating</option>
+                                <option value="drum">Drum Size</option>
+                                <option value="length">Length per Drum</option>
+
+                            </select>
+                            <button onclick="clearConductorSelection()" class="w-full premium-btn bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-200">
+                                Clear Selection
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="conductor-table-wrapper" class="premium-card !p-0 overflow-hidden hidden transform transition-transform duration-300"></div>
+                    
+                    <div id="conductor-empty" class="py-12 text-center text-slate-500">
+                        <i class="ph ph-table text-4xl mb-3 opacity-50"></i>
+                        <p>Select a cable type from the dropdown to view specifications.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 👤 USER PROFILE SETTINGS VIEW (APP USER) -->
+            <div id="view-profile" class="view-section hidden animate-fade-in">
+                <div class="max-w-2xl mx-auto premium-card">
+                    <div class="flex items-center mb-6">
+                        <button onclick="navigate('dashboard')" class="flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-primary to-blue-400 text-white rounded-xl shadow-md hover:-translate-y-0.5 transition-all text-sm font-semibold border border-blue-400/50">
+                            <i class="ph ph-house text-lg"></i> Back to Home
+                        </button>
+                    </div>
+
+                    <h3 class="text-xl font-bold mb-6 flex items-center gap-2"><i class="ph ph-user-circle text-primary"></i> Profile Settings</h3>
+                    
+                    <form id="form-profile" onsubmit="saveProfile(event)" class="space-y-6">
+                        <div class="flex flex-col items-center sm:flex-row gap-6 pb-6 border-b border-slate-100 dark:border-slate-700">
+                            <div class="relative group">
+                                <img id="profile-preview" src="" alt="Profile" class="w-24 h-24 rounded-full object-cover border-4 border-slate-50 dark:border-slate-800 shadow-md">
+                                <label for="profile-upload" class="absolute inset-0 flex items-center justify-center bg-black/50 text-white rounded-full opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity">
+                                    <i class="ph ph-camera text-xl"></i>
+                                </label>
+                                <input type="file" id="profile-upload" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
+                            </div>
+                            <div class="text-center sm:text-left">
+                                <h4 class="font-semibold">Profile Picture</h4>
+                                <p class="text-xs text-slate-500 mt-1">Upload a photo from your gallery (Max 2MB).</p>
+                                <label for="profile-upload" class="mt-3 inline-block px-4 py-1.5 rounded-lg text-sm font-medium bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors">Choose Image</label>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div>
+                                <label class="premium-label">Full Name</label>
+                                <input type="text" id="profile-name" class="premium-input" required>
+                            </div>
+                            <div>
+                                <label class="premium-label">Laboratory / Facility Address</label>
+                                <textarea id="profile-address" class="premium-input resize-none h-24" required></textarea>
+                            </div>
+                        </div>
+
+                        <div class="pt-4 flex justify-end">
+                            <button type="submit" class="premium-btn bg-primary text-white hover:bg-blue-700 shadow-lg shadow-blue-500/30">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+
+
+
+
+
+
+
+
+
+            <!-- 👨‍💻 DEVELOPER VIEW (STATIC PORTFOLIO) -->
+            <div id="view-developer" class="view-section hidden animate-fade-in">
+                <div class="max-w-2xl mx-auto">
+                    <div class="flex items-center mb-6">
+                        <button onclick="navigate('dashboard')" class="flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-primary to-blue-400 text-white rounded-xl shadow-md hover:-translate-y-0.5 transition-all duration-200 active:scale-95 text-sm font-semibold border border-blue-400/50">
+                            <i class="ph ph-house text-lg"></i> Back to Home
+                        </button>
+                    </div>
+
+                    <div class="premium-card text-center">
+                        <div class="relative inline-block mb-4">
+                            <div class="w-28 h-28 mx-auto bg-slate-200 dark:bg-slate-700 rounded-full flex items-center justify-center border-4 border-white dark:border-slate-800 shadow-xl overflow-hidden">
+                                <img src="img.jpg" alt="Developer Logo" class="w-full h-full object-cover">
+                            </div>
+                            <div class="absolute bottom-1 right-1 bg-green-500 w-6 h-6 rounded-full border-4 border-white dark:border-slate-800"></div>
+                        </div>
+
+                        <h2 class="text-2xl font-black text-slate-800 dark:text-slate-100 tracking-tight">TARIK ZAMAN</h2>
+                        <p class="text-sm font-bold text-primary tracking-widest uppercase mt-1 mb-6">App Architect & Developer</p>
+                        
+                        <p class="text-slate-600 dark:text-slate-300 leading-relaxed max-w-md mx-auto mb-8">
+This app is made with pure vanilla JS and Tailwind CSS. If you need to build any apps at low cost, please contact us. zamantarik1@gmail.com
+                        </p>
+
+<!-- Contact/Social Links (Brand Colors & Realistic Glow) -->
+<div class="flex justify-center gap-4 border-t border-slate-100 dark:border-slate-700/50 pt-6">
+    
+    <!-- Facebook (Official Blue: #1877F2) -->
+    <a href="https://www.facebook.com/share/1Feoeyq5NR" target="_blank" class="group w-12 h-12 flex items-center justify-center bg-white dark:bg-slate-800 text-[#1877F2] rounded-xl transition-all duration-300 shadow-sm border border-slate-200 dark:border-slate-700 hover:bg-blue-50 dark:hover:bg-[#1877F2]/10 hover:border-blue-200 dark:hover:border-[#1877F2]/30 hover:shadow-md hover:shadow-[#1877F2]/20 hover:-translate-y-1">
+        <i class="ph-fill ph-facebook-logo text-2xl group-hover:scale-110 transition-transform"></i>
+    </a>
+
+    <!-- WhatsApp (Official Green: #25D366) -->
+    <a href="https://wa.me/8801617283836" target="_blank" class="group w-12 h-12 flex items-center justify-center bg-white dark:bg-slate-800 text-[#25D366] rounded-xl transition-all duration-300 shadow-sm border border-slate-200 dark:border-slate-700 hover:bg-green-50 dark:hover:bg-[#25D366]/10 hover:border-green-200 dark:hover:border-[#25D366]/30 hover:shadow-md hover:shadow-[#25D366]/20 hover:-translate-y-1">
+        <i class="ph-fill ph-whatsapp-logo text-2xl group-hover:scale-110 transition-transform"></i>
+    </a>
+
+    <!-- LinkedIn (Official Blue: #0A66C2) -->
+    <a href="https://www.linkedin.com/in/tarik-zaman-271b77212?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app" target="_blank" class="group w-12 h-12 flex items-center justify-center bg-white dark:bg-slate-800 text-[#0A66C2] dark:text-[#4facfe] rounded-xl transition-all duration-300 shadow-sm border border-slate-200 dark:border-slate-700 hover:bg-blue-50 dark:hover:bg-[#0A66C2]/10 hover:border-blue-200 dark:hover:border-[#0A66C2]/30 hover:shadow-md hover:shadow-[#0A66C2]/20 hover:-translate-y-1">
+        <i class="ph-fill ph-linkedin-logo text-2xl group-hover:scale-110 transition-transform"></i>
+    </a>
+
+    <!-- Telegram (Official Blue: #229ED9) -->
+    <a href="https://t.me/zaman2736" target="_blank" class="group w-12 h-12 flex items-center justify-center bg-white dark:bg-slate-800 text-[#229ED9] rounded-xl transition-all duration-300 shadow-sm border border-slate-200 dark:border-slate-700 hover:bg-sky-50 dark:hover:bg-[#229ED9]/10 hover:border-sky-200 dark:hover:border-[#229ED9]/30 hover:shadow-md hover:shadow-[#229ED9]/20 hover:-translate-y-1">
+        <i class="ph-fill ph-telegram-logo text-2xl group-hover:scale-110 transition-transform"></i>
+    </a>
+
+</div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Toast Notifications Area -->
+    <div id="toast-container"></div>
+
+    <!-- 🚫 STRICT OFFLINE OVERLAY -->
+    <div id="offline-overlay" class="fixed inset-0 z-[999] bg-slate-900/80 backdrop-blur-md hidden flex items-center justify-center transition-all duration-300 opacity-0 pointer-events-none">
+        <div id="offline-card" class="bg-white dark:bg-slate-800 rounded-2xl p-8 max-w-sm w-full mx-4 shadow-2xl text-center transform scale-95 transition-transform duration-300">
+            <div class="relative w-20 h-20 mx-auto mb-6">
+                <div class="absolute inset-0 bg-red-100 dark:bg-red-900/30 rounded-full animate-ping opacity-75"></div>
+                <div class="relative w-full h-full bg-red-100 dark:bg-red-900/50 rounded-full flex items-center justify-center border-4 border-white dark:border-slate-800">
+                    <i class="ph ph-wifi-slash text-4xl text-red-500"></i>
+                </div>
+            </div>
+            <h3 class="text-2xl font-black text-slate-800 dark:text-white mb-2 tracking-tight">No Internet Connection</h3>
+            <p class="text-slate-500 dark:text-slate-400 mb-8 text-sm leading-relaxed">
+                Conductor Test Pro requires an active internet connection to synchronize data and run properly. Please check your network settings.
+            </p>
+            <div class="bg-slate-50 dark:bg-slate-900 rounded-xl p-4 flex flex-col items-center border border-slate-100 dark:border-slate-700">
+                <i class="ph ph-spinner-gap animate-spin text-primary text-2xl mb-2"></i>
+                <p class="text-xs font-semibold text-slate-400 uppercase tracking-widest">Waiting for connection...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- External JavaScript -->
+    <script src="app.js"></script>
+</body>
+</html>
